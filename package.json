@@ -1,0 +1,30 @@
+{
+  "name": "pre-signed-upload",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx jest",
+    "lint": "eslint . --fix --cache",
+    "prettify": "prettier --write --ignore-path .gitignore '**/*.{css,html,js,json,md,yaml,yml}'"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@silvermine/serverless-plugin-cloudfront-lambda-edge": "^2.1.1",
+    "aws-sdk": "^2.448.0",
+    "eslint": "^5.12.1",
+    "eslint-config-maasglobal": "^2.0.6",
+    "eslint-plugin-import": "^2.15.0",
+    "jest": "^24.7.1",
+    "prettier": "^1.16.1"
+  },
+  "dependencies": {
+    "uuid": "^3.3.2"
+  },
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true,
+    "testEnvironment": "node"
+  }
+}

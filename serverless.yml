@@ -1,0 +1,124 @@
+service: pre-signed-upload
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  region: us-east-1 # lambda@edge functions & cloudfront needs to be deployed to us-east-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
+      Resource:
+        - arn:aws:logs:*:*:* # allow replicated lambdas to create logs
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+      Resource: 'arn:aws:s3:::${self:custom.config.bucket}/*'
+functions:
+  url:
+    handler: url/index.handler
+    memorySize: 128
+    timeout: 5
+    lambdaAtEdge:
+      distribution: CloudFront
+      eventType: viewer-request
+      pathPattern: 'url'
+  validate:
+    handler: validate/index.handler
+    memorySize: 128
+    timeout: 5
+    lambdaAtEdge:
+      distribution: CloudFront
+      eventType: viewer-request
+
+plugins:
+  - '@silvermine/serverless-plugin-cloudfront-lambda-edge'
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  config: ${file(./config.json)} # config json has shared parameters -> Lambda@Edge doesn't support Lambda environmental variables
+
+resources:
+  Resources:
+    Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.config.bucket}
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
+    CloudFront:
+      Type: AWS::CloudFront::Distribution
+      DependsOn: Bucket
+      Properties:
+        DistributionConfig:
+          Enabled: true
+          Comment: '${self:custom.stage}-${self:service}'
+          PriceClass: PriceClass_100
+          HttpVersion: http2
+          IPV6Enabled: true
+          ViewerCertificate:
+            CloudFrontDefaultCertificate: true
+          CustomErrorResponses:
+            - ErrorCachingMinTTL: 0
+              ErrorCode: 400
+            - ErrorCachingMinTTL: 0
+              ErrorCode: 403
+            - ErrorCachingMinTTL: 0
+              ErrorCode: 404
+            - ErrorCachingMinTTL: 0
+              ErrorCode: 405
+            - ErrorCachingMinTTL: 0
+              ErrorCode: 414
+            - ErrorCachingMinTTL: 0
+              ErrorCode: 416
+            - ErrorCachingMinTTL: 0
+              ErrorCode: 500
+            - ErrorCachingMinTTL: 0
+              ErrorCode: 501
+            - ErrorCachingMinTTL: 0
+              ErrorCode: 502
+            - ErrorCachingMinTTL: 0
+              ErrorCode: 503
+            - ErrorCachingMinTTL: 0
+              ErrorCode: 504
+          Origins:
+            - DomainName: ${self:custom.config.bucket}.s3.amazonaws.com
+              Id: S3Origin
+              S3OriginConfig: {}
+          DefaultCacheBehavior:
+            TargetOriginId: S3Origin
+            ViewerProtocolPolicy: redirect-to-https
+            DefaultTTL: 0
+            MaxTTL: 0
+            MinTTL: 0
+            ForwardedValues:
+              QueryString: 'true'
+              Cookies:
+                Forward: none
+            AllowedMethods:
+              - DELETE
+              - GET
+              - HEAD
+              - OPTIONS
+              - PATCH
+              - POST
+              - PUT
+          CacheBehaviors:
+            - TargetOriginId: S3Origin
+              ViewerProtocolPolicy: redirect-to-https
+              DefaultTTL: 0
+              MaxTTL: 0
+              MinTTL: 0
+              ForwardedValues:
+                QueryString: 'false'
+                Cookies:
+                  Forward: none
+              PathPattern: 'url'
+              AllowedMethods:
+                - GET
+                - HEAD
