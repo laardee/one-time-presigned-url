@@ -1,13 +1,12 @@
 'use strict';
 
 const AWS = require('aws-sdk');
-
-const s3 = new AWS.S3({ region: 'us-east-1', signatureVersion: 'v4' });
-
 const uuidv4 = require('uuid/v4');
 const url = require('url');
 
 const { bucket } = require('../config.json');
+const s3 = new AWS.S3({ region: 'us-east-1', signatureVersion: 'v4' });
+const crypto = require('crypto');
 
 exports.handler = async event => {
   const { request } = event.Records[0].cf;
@@ -20,6 +19,21 @@ exports.handler = async event => {
 
   const { path } = url.parse(signedUrl);
   const host = headers.host[0].value;
+
+  const hash = crypto
+    .createHash('sha256')
+    .update(path)
+    .digest('hex');
+
+  await s3
+    .putObject({
+      Bucket: bucket,
+      Key: `signatures/valid/${hash}`,
+      Body: JSON.stringify({ created: Date.now() }),
+      ContentType: 'application/json',
+      ContentEncoding: 'gzip',
+    })
+    .promise();
 
   const response = {
     status: '200',

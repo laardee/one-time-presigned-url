@@ -16,6 +16,7 @@ provider:
       Action:
         - s3:PutObject
         - s3:GetObject
+        - s3:ListBucketVersions
       Resource: 'arn:aws:s3:::${self:custom.config.bucket}/*'
 functions:
   url:
@@ -51,6 +52,8 @@ resources:
           ServerSideEncryptionConfiguration:
             - ServerSideEncryptionByDefault:
                 SSEAlgorithm: AES256
+        VersioningConfiguration:
+          Status: Enabled
     CloudFront:
       Type: AWS::CloudFront::Distribution
       DependsOn: Bucket
