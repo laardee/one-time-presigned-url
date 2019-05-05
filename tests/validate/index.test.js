@@ -2,6 +2,7 @@
 
 const AWS = require('aws-sdk');
 const { handler } = require('../../validate/index');
+const config = require('../../config.json');
 
 let dateNowSpy;
 
@@ -86,16 +87,16 @@ describe('#validate', () => {
       ],
     });
     expect(AWS.mocks.headObjectMock).toBeCalledWith({
-      Bucket: 'temp-bucketname-maas',
+      Bucket: config.bucket,
       Key: 'signatures/valid/fa506f4395964d0e7d68eca652805ffa08a27613aee67fc7f27190f1dd0f9401',
     });
     expect(AWS.mocks.headObjectMock).toBeCalledWith({
-      Bucket: 'temp-bucketname-maas',
+      Bucket: config.bucket,
       Key: 'signatures/expired/fa506f4395964d0e7d68eca652805ffa08a27613aee67fc7f27190f1dd0f9401',
     });
     expect(AWS.mocks.putObjectMock).toBeCalledWith({
       Body: '{"created":1556871773724}',
-      Bucket: 'temp-bucketname-maas',
+      Bucket: config.bucket,
       ContentEncoding: 'gzip',
       ContentType: 'application/json',
       Key: 'signatures/expired/fa506f4395964d0e7d68eca652805ffa08a27613aee67fc7f27190f1dd0f9401',
@@ -144,11 +145,11 @@ describe('#validate', () => {
     });
 
     expect(AWS.mocks.headObjectMock).toBeCalledWith({
-      Bucket: 'temp-bucketname-maas',
+      Bucket: config.bucket,
       Key: 'signatures/valid/fa506f4395964d0e7d68eca652805ffa08a27613aee67fc7f27190f1dd0f9401',
     });
     expect(AWS.mocks.headObjectMock).toBeCalledWith({
-      Bucket: 'temp-bucketname-maas',
+      Bucket: config.bucket,
       Key: 'signatures/expired/fa506f4395964d0e7d68eca652805ffa08a27613aee67fc7f27190f1dd0f9401',
     });
     expect(AWS.mocks.headObjectMock).toBeCalledTimes(2);
@@ -211,11 +212,11 @@ describe('#validate', () => {
     });
 
     expect(AWS.mocks.headObjectMock).toBeCalledWith({
-      Bucket: 'temp-bucketname-maas',
+      Bucket: config.bucket,
       Key: 'signatures/valid/fa506f4395964d0e7d68eca652805ffa08a27613aee67fc7f27190f1dd0f9401',
     });
     expect(AWS.mocks.headObjectMock).toBeCalledWith({
-      Bucket: 'temp-bucketname-maas',
+      Bucket: config.bucket,
       Key: 'signatures/expired/fa506f4395964d0e7d68eca652805ffa08a27613aee67fc7f27190f1dd0f9401',
     });
     expect(AWS.mocks.headObjectMock).toBeCalledTimes(2);

@@ -1,9 +1,9 @@
 'use strict';
 
 const AWS = require('aws-sdk');
-const uuidv4 = require('uuid/v4');
 
 const { handler } = require('../../url/index');
+const config = require('../../config.json');
 
 let dateNowSpy;
 
@@ -72,7 +72,7 @@ describe('#url', () => {
     expect(AWS.mocks.putObjectMock).toBeCalledTimes(1);
     expect(AWS.mocks.putObjectMock).toBeCalledWith({
       Body: '{"created":1556871773724}',
-      Bucket: 'temp-bucketname-maas',
+      Bucket: config.bucket,
       ContentEncoding: 'gzip',
       ContentType: 'application/json',
       Key: 'signatures/valid/7d2cb4d16ded97085a81a8e95bf1c78007a47af656586b3563d46183657e2d3b',
