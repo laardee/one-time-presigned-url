@@ -1,9 +1,11 @@
 # Pre-signed upload to S3 with a one time token
 
-- S3 Pre-Signed URL
-- CloudFront
-- Lambda@Edge
+See [Expiring Presigned S3 URL on Initial Upload @ Medium](https://medium.com)
 
-## Description
+## Setup
 
-User fetches a pre-signed url from backend and uses that to upload data to S3 bucket. If bad guys get that pre-signed url, it can be used to again to upload a replacement. In this example the Lambda@Edge functions are used to generate to url and prevent multiple uploads.
+Edit the config.json file and change the name of the bucket, rename the project by editing the service name in serverless.yml
+
+## Deployment
+
+Use Serverless Framework for deployment. Install the dependecies with `npm install` and then run `sls deploy` in the project root to start the deployment.
