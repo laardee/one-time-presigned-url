@@ -176,15 +176,15 @@ describe('#validate', () => {
     AWS.mocks.listObjectVersionsMock = jest.fn().mockResolvedValueOnce({
       Versions: [
         {
-          LastModified: 'fa',
-          IsLatest: true,
-          VersionId: 'mock.version.id',
-        },
-        {
-          LastModified: 'fa',
+          LastModified: '2019-05-05T19:57:27.000Z',
           IsLatest: false,
           VersionId: 'mock.initial-version.id',
         },
+        {
+          LastModified: '2019-05-05T19:59:27.000Z',
+          IsLatest: true,
+          VersionId: 'mock.version.id',
+        }
       ],
     });
     const response = await handler({
@@ -246,11 +246,6 @@ describe('#validate', () => {
           LastModified: 'fa',
           IsLatest: true,
           VersionId: 'mock.version.id',
-        },
-        {
-          LastModified: 'fa',
-          IsLatest: false,
-          VersionId: 'mock.initial-version.id',
         },
       ],
     });

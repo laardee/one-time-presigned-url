@@ -81,10 +81,14 @@ exports.handler = async event => {
     })
     .promise();
 
-  console.log({ version, versions });
+  console.log(JSON.stringify({ version, versions }));
 
-  // if there are more that one version of the index file and current is not the first version
-  if (versions.length > 1 && versions.reverse()[0].VersionId !== version) {
+  const sortedVersions = versions.concat().sort((a, b) => {
+    return a.LastModified > b.LastModified;
+  });
+
+  // if there are more that one version of the index file and current is not the initial version
+  if (sortedVersions.length > 1 && sortedVersions[0].VersionId !== version) {
     return forbiddenResponse;
   }
 
