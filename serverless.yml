@@ -16,8 +16,11 @@ provider:
       Action:
         - s3:PutObject
         - s3:GetObject
+        - s3:ListBucket
         - s3:ListBucketVersions
-      Resource: 'arn:aws:s3:::${self:custom.config.bucket}/*'
+      Resource:
+        - 'arn:aws:s3:::${self:custom.config.bucket}'
+        - 'arn:aws:s3:::${self:custom.config.bucket}/*'
 functions:
   url:
     handler: url/index.handler
