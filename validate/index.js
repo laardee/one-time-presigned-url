@@ -27,8 +27,8 @@ const forbiddenResponse = {
   body: 'Forbidden',
 };
 
-const headSignature = async ({ type, signature }) => {
-  const key = `signatures/${type}/${signature}`;
+const headSignature = async ({ type, hash }) => {
+  const key = `signatures/${type}/${hash}`;
   try {
     await s3
       .headObject({
@@ -45,16 +45,10 @@ const headSignature = async ({ type, signature }) => {
 exports.handler = async event => {
   const { request } = event.Records[0].cf;
   const { querystring, uri, method } = request;
-  const { 'X-Amz-Signature': signature } = qs.parse(querystring);
 
   if (method !== 'PUT') {
     return forbiddenResponse;
   }
-
-  const params = {
-    Bucket: bucket,
-    Key: `signatures${uri}${signature}`,
-  };
 
   const hash = crypto
     .createHash('sha256')
@@ -62,8 +56,8 @@ exports.handler = async event => {
     .digest('hex');
 
   const [validSignature, expiredSignature] = await Promise.all([
-    headSignature({ type: 'valid', signature: hash }),
-    headSignature({ type: 'expired', signature: hash }),
+    headSignature({ type: 'valid', hash }),
+    headSignature({ type: 'expired', hash }),
   ]);
 
   if (!validSignature || expiredSignature) {
