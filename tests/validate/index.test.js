@@ -231,4 +231,63 @@ describe('#validate', () => {
       body: 'Forbidden',
     });
   });
+
+  it('should deny access if not PUT method is used', async () => {
+    AWS.mocks.headObjectMock = jest.fn(({ Bucket, Key }) => {
+      if (/signatures\/valid/.test(Key)) {
+        return Promise.resolve();
+      } else if (/signatures\/expired/.test(Key)) {
+        return Promise.reject(new Error());
+      }
+    });
+    AWS.mocks.listObjectVersionsMock = jest.fn().mockResolvedValueOnce({
+      Versions: [
+        {
+          LastModified: 'fa',
+          IsLatest: true,
+          VersionId: 'mock.version.id',
+        },
+        {
+          LastModified: 'fa',
+          IsLatest: false,
+          VersionId: 'mock.initial-version.id',
+        },
+      ],
+    });
+    const response = await handler({
+      Records: [
+        {
+          cf: {
+            request: {
+              headers: {
+                host: [
+                  {
+                    key: 'Host',
+                    value: 'temp.cloudfront.net',
+                  },
+                ],
+              },
+              method: 'GET',
+              querystring:
+                'X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=mock-credentials&X-Amz-Date=20190502T194435Z&X-Amz-Expires=900&X-Amz-Security-Token=mock-security-token&X-Amz-Signature=mock-signature&X-Amz-SignedHeaders=host',
+              uri: '/db1fa5f6-e2ab-4447-9511-2b8093e388cf',
+            },
+          },
+        },
+      ],
+    });
+
+    expect(AWS.mocks.headObjectMock).toBeCalledTimes(0);
+    expect(AWS.mocks.putObjectMock).toBeCalledTimes(0);
+    expect(AWS.mocks.listObjectVersionsMock).toBeCalledTimes(0);
+    expect(response).toEqual({
+      status: '403',
+      statusDescription: 'Forbidden',
+      headers: {
+        'content-type': [{ key: 'Content-Type', value: 'text/plain' }],
+        'content-encoding': [{ key: 'Content-Encoding', value: 'UTF-8' }],
+      },
+      body: 'Forbidden',
+    });
+  });
 });

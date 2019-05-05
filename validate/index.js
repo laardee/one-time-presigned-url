@@ -44,8 +44,12 @@ const headSignature = async ({ type, signature }) => {
 
 exports.handler = async event => {
   const { request } = event.Records[0].cf;
-  const { querystring, uri } = request;
+  const { querystring, uri, method } = request;
   const { 'X-Amz-Signature': signature } = qs.parse(querystring);
+
+  if (method !== 'PUT') {
+    return forbiddenResponse;
+  }
 
   const params = {
     Bucket: bucket,
