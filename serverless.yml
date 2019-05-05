@@ -59,11 +59,11 @@ resources:
           Status: Enabled
         CorsConfiguration:
           CorsRules:
-          - AllowedHeaders: ['*']
-            AllowedMethods: [GET,PUT]
-            AllowedOrigins: ['*']
-            Id: CORSRuleId1
-            MaxAge: '3600'
+            - AllowedHeaders: ['*']
+              AllowedMethods: [GET, PUT]
+              AllowedOrigins: ['*']
+              Id: CORSRuleId1
+              MaxAge: '3600'
     CloudFront:
       Type: AWS::CloudFront::Distribution
       DependsOn: Bucket

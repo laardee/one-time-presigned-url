@@ -1,7 +1,6 @@
 'use strict';
 
 const AWS = require('aws-sdk');
-const qs = require('querystring');
 const crypto = require('crypto');
 
 const { bucket } = require('../config.json');
@@ -27,7 +26,7 @@ const forbiddenResponse = {
   body: 'Forbidden',
 };
 
-const headSignature = async ({ type, hash }) => {
+async function headSignature({ type, hash }) {
   const key = `signatures/${type}/${hash}`;
   try {
     await s3
@@ -40,7 +39,7 @@ const headSignature = async ({ type, hash }) => {
   } catch (error) {
     return false;
   }
-};
+}
 
 exports.handler = async event => {
   const { request } = event.Records[0].cf;
@@ -80,8 +79,6 @@ exports.handler = async event => {
       Prefix: `signatures/expired/${hash}`,
     })
     .promise();
-
-  console.log(JSON.stringify({ version, versions }));
 
   const sortedVersions = versions.concat().sort((a, b) => {
     return a.LastModified > b.LastModified;

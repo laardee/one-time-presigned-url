@@ -63,6 +63,7 @@ describe('#validate', () => {
       } else if (/signatures\/expired/.test(Key)) {
         return Promise.reject(new Error());
       }
+      return Promise.reject(new Error());
     });
     const response = await handler({
       Records: [
@@ -120,6 +121,7 @@ describe('#validate', () => {
       } else if (/signatures\/expired/.test(Key)) {
         return Promise.resolve();
       }
+      return Promise.reject(new Error());
     });
     const response = await handler({
       Records: [
@@ -173,6 +175,7 @@ describe('#validate', () => {
       } else if (/signatures\/expired/.test(Key)) {
         return Promise.reject(new Error());
       }
+      return Promise.reject(new Error());
     });
     AWS.mocks.listObjectVersionsMock = jest.fn().mockResolvedValueOnce({
       Versions: [
@@ -185,7 +188,7 @@ describe('#validate', () => {
           LastModified: '2019-05-05T19:59:27.000Z',
           IsLatest: true,
           VersionId: 'mock.version.id',
-        }
+        },
       ],
     });
     const response = await handler({
@@ -240,6 +243,7 @@ describe('#validate', () => {
       } else if (/signatures\/expired/.test(Key)) {
         return Promise.reject(new Error());
       }
+      return Promise.reject(new Error());
     });
     AWS.mocks.listObjectVersionsMock = jest.fn().mockResolvedValueOnce({
       Versions: [
