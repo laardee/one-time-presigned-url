@@ -1,9 +1,9 @@
-service: pre-signed-upload
+service: presigned-upload # change this
 
 provider:
   name: aws
   runtime: nodejs8.10
-  region: us-east-1 # lambda@edge functions & cloudfront needs to be deployed to us-east-1
+  region: us-east-1 # lambda@edge functions needs to be deployed to us-east-1 region
   iamRoleStatements:
     - Effect: Allow
       Action:
