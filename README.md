@@ -1,4 +1,4 @@
-# Pre-signed upload to S3 with a one time token
+# Uploading Objects to S3 Using One-Time Presigned URLs
 
 See [Uploading Objects to S3 Using One-Time Presigned URLs @ Medium](https://medium.com/@laardee/uploading-objects-to-s3-using-one-time-presigned-urls-4374943f0801)
 
