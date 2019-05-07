@@ -3,7 +3,7 @@ service: presigned-upload # change this
 provider:
   name: aws
   runtime: nodejs8.10
-  region: us-east-1 # lambda@edge functions needs to be deployed to us-east-1 region
+  region: us-east-1 # lambda@edge functions & cloudfront needs to be deployed to us-east-1
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -12,15 +12,6 @@ provider:
         - logs:PutLogEvents
       Resource:
         - arn:aws:logs:*:*:* # allow replicated lambdas to create logs
-    - Effect: Allow
-      Action:
-        - s3:PutObject
-        - s3:GetObject
-        - s3:ListBucket
-        - s3:ListBucketVersions
-      Resource:
-        - 'arn:aws:s3:::${self:custom.config.bucket}'
-        - 'arn:aws:s3:::${self:custom.config.bucket}/*'
 functions:
   url:
     handler: url/index.handler
@@ -30,6 +21,12 @@ functions:
       distribution: CloudFront
       eventType: viewer-request
       pathPattern: 'url'
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+        Resource:
+          - 'arn:aws:s3:::${self:custom.config.bucket}/*'
   validate:
     handler: validate/index.handler
     memorySize: 128
@@ -37,13 +34,27 @@ functions:
     lambdaAtEdge:
       distribution: CloudFront
       eventType: viewer-request
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:PutObject
+          - s3:GetObject
+          - s3:ListBucket
+          - s3:ListBucketVersions
+        Resource:
+          - 'arn:aws:s3:::${self:custom.config.bucket}'
+          - 'arn:aws:s3:::${self:custom.config.bucket}/*'
 
 plugins:
   - '@silvermine/serverless-plugin-cloudfront-lambda-edge'
+  - serverless-iam-roles-per-function
+
 
 custom:
   stage: ${opt:stage, self:provider.stage}
   config: ${file(./config.json)} # config json has shared parameters -> Lambda@Edge doesn't support Lambda environmental variables
+  serverless-iam-roles-per-function:
+    defaultInherit: true
 
 resources:
   Resources:

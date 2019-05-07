@@ -17,7 +17,8 @@
     "eslint-config-maasglobal": "^2.0.6",
     "eslint-plugin-import": "^2.15.0",
     "jest": "^24.7.1",
-    "prettier": "^1.16.1"
+    "prettier": "^1.16.1",
+    "serverless-iam-roles-per-function": "^2.0.0"
   },
   "dependencies": {
     "uuid": "^3.3.2"
